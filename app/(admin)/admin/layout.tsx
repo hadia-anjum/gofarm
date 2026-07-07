@@ -62,7 +62,7 @@ const AdminLayout = ({ children }: AdminLayoutProps) => {
       <Container className="py-6">
         <div className="flex flex-col gap-6">
           {/* Top Navigation */}
-          <AdminTopNavigation currentPath={pathname} user={user} />
+          <AdminTopNavigation currentPath={pathname} user={user as any} />
 
           {/* Main Content */}
           <div className="admin-content-push bg-white rounded-2xl shadow-xl border border-gofarm-light-green/10 overflow-hidden">

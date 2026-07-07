@@ -112,7 +112,7 @@ export default async function ProfilePage() {
         lastSignInTime: firebaseUser.metadata.lastSignInTime,
       },
       providerData:
-        firebaseUser.providerData?.map((provider) => ({
+        firebaseUser.providerData?.map((provider: any) => ({
           providerId: provider.providerId,
           uid: provider.uid,
           displayName: provider.displayName || null,

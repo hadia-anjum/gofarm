@@ -290,7 +290,7 @@ const SingleBlogPage = async ({
                             ),
                             link: ({ value, children }) => (
                               <Link
-                                href={value.href}
+                                href={value?.href || "#"}
                                 className="font-medium text-gofarm-light-green hover:text-gofarm-green underline decoration-gofarm-light-green underline-offset-4 hover:decoration-gofarm-green transition-colors"
                               >
                                 {children}
@@ -355,9 +355,9 @@ const BlogSidebar = async ({ slug }: { slug: string }) => {
     categories?.reduce(
       (
         acc: Array<{ _id: string; title: string | null; slug: string | null }>,
-        blog
+        blog: any
       ) => {
-        blog.blogcategories?.forEach((category) => {
+        blog.blogcategories?.forEach((category: any) => {
           if (
             category &&
             category.title &&
