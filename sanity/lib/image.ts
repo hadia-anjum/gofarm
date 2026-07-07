@@ -2,8 +2,22 @@ import { createImageUrlBuilder } from "@sanity/image-url";
 import { SanityImageSource } from "@sanity/image-url";
 import { dataset, projectId } from "../env";
 
-// https://www.sanity.io/docs/image-url
 const builder = createImageUrlBuilder({ projectId, dataset });
+
+// A chainable helper proxy that handles any method call and returns itself,
+// except for .url() which returns the target string URL.
+const createMockBuilder = (imageUrl: string) => {
+  const handler: ProxyHandler<any> = {
+    get(target, prop) {
+      if (prop === 'url') {
+        return () => imageUrl;
+      }
+      return () => proxy;
+    }
+  };
+  const proxy = new Proxy({}, handler);
+  return proxy;
+};
 
 export const urlFor = (source: SanityImageSource) => {
   try {
@@ -13,16 +27,7 @@ export const urlFor = (source: SanityImageSource) => {
     
     // Check if source is already a direct HTTP/S string
     if (typeof source === "string" && (source.startsWith("http://") || source.startsWith("https://"))) {
-      const mockBuilder = {
-        url: () => source,
-        width: () => mockBuilder,
-        height: () => mockBuilder,
-        fit: () => mockBuilder,
-        blur: () => mockBuilder,
-        quality: () => mockBuilder,
-        auto: () => mockBuilder,
-      };
-      return mockBuilder as any;
+      return createMockBuilder(source) as any;
     }
 
     // Intercept malformed asset references (like custom Unsplash assets) to avoid builder crashes
@@ -30,38 +35,16 @@ export const urlFor = (source: SanityImageSource) => {
     if (assetRef && !assetRef.startsWith("image-")) {
       let resolvedUrl = "https://images.unsplash.com/photo-1500937386664-56d1dfef3854?w=500&h=500&fit=crop";
       if (assetRef.includes("photo-")) {
-        // Extract Unsplash image name/id
         const cleanRef = assetRef.replace("image-", "");
         resolvedUrl = `https://images.unsplash.com/${cleanRef}`;
       }
-      
-      const mockBuilder = {
-        url: () => resolvedUrl,
-        width: () => mockBuilder,
-        height: () => mockBuilder,
-        fit: () => mockBuilder,
-        blur: () => mockBuilder,
-        quality: () => mockBuilder,
-        auto: () => mockBuilder,
-      };
-      return mockBuilder as any;
+      return createMockBuilder(resolvedUrl) as any;
     }
 
     return builder.image(source);
   } catch (error) {
     console.error("Safe urlFor builder caught error: ", error);
-    // Return fallback URL builder to prevent page breaks
     const fallbackUrl = "https://images.unsplash.com/photo-1500937386664-56d1dfef3854?w=500&h=500&fit=crop";
-    const mockBuilder = {
-      url: () => fallbackUrl,
-      width: () => mockBuilder,
-      height: () => mockBuilder,
-      fit: () => mockBuilder,
-      blur: () => mockBuilder,
-      quality: () => mockBuilder,
-      auto: () => mockBuilder,
-      rect: () => mockBuilder,
-    };
-    return mockBuilder as any;
+    return createMockBuilder(fallbackUrl) as any;
   }
 };
