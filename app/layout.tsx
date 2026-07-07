@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 import localFont from "next/font/local";
 import { Jost } from "next/font/google";
 import { Toaster } from "sonner";
-import AuthInitializer from "@/components/AuthInitializer";
+
 import ShareSidebar from "@/components/ShareSidebar";
 import "./globals.css";
 
@@ -91,7 +91,7 @@ const RootLayout = async ({ children }: { children: ReactNode }) => {
   return (
     <html lang="en">
       <body className={`${jost.variable} antialiased`}>
-        <AuthInitializer />
+
         <ShareSidebar />
         {children}
 

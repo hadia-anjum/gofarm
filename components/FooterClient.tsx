@@ -23,7 +23,7 @@ const FooterClient = () => {
           slug
         }`;
         const data = await client.fetch(categoriesQuery);
-        setCategories(data);
+        setCategories(Array.isArray(data) ? data : []);
       } catch (error) {
         console.error("Error fetching categories:", error);
       } finally {

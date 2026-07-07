@@ -91,7 +91,7 @@ const ProductGrid = () => {
           weight
         }`;
         const variants = await client.fetch(variantsQuery);
-        const safeVariants = variants || [];
+        const safeVariants = Array.isArray(variants) ? variants : [];
         setProductVariants(safeVariants);
         if (safeVariants.length > 0) {
           setSelectedTab(safeVariants[0]._id);
@@ -125,7 +125,7 @@ const ProductGrid = () => {
           const products = await client.fetch(query, {
             variantId: variant._id,
           });
-          productsByVariantData[variant._id] = products || [];
+          productsByVariantData[variant._id] = Array.isArray(products) ? products : [];
         }
 
         setProductsByVariant(productsByVariantData);
@@ -172,8 +172,9 @@ const ProductGrid = () => {
       setLoading(true);
       try {
         const response = await client.fetch(query, params);
-        setProducts(await response);
-        setFilteredProducts(await response);
+        const safeProducts = Array.isArray(response) ? response : [];
+        setProducts(safeProducts);
+        setFilteredProducts(safeProducts);
       } catch (error) {
         console.log("Product fetching Error", error);
       } finally {
