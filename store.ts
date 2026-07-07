@@ -373,18 +373,20 @@ const useCartStore = create<StoreState>()(
               headers: { Authorization: `Bearer ${token}` },
             });
 
-            if (!response.ok) {
-              const errorData = await response.json();
-              console.error("Failed to clear cart from Sanity:", errorData);
-              throw new Error(errorData.message || "Failed to clear cart");
+            if (response.ok) {
+              try {
+                const data = await response.json();
+                console.log("✅ Cart cleared from Sanity:", data.message);
+              } catch {
+                // Response might not be JSON, that's OK
+              }
+            } else {
+              console.log("Cart clear API unavailable (offline mode)");
             }
-
-            const data = await response.json();
-            console.log("✅ Cart cleared from Sanity:", data.message);
           }
         } catch (err) {
           console.error("❌ Error clearing cart from Sanity:", err);
-          throw err; // Re-throw so calling code can handle it
+          // Don't re-throw - cart was already cleared locally
         }
       },
       // Coupon methods

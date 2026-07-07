@@ -24,7 +24,7 @@ async function getBanners(): Promise<Banner[]> {
         cache: "no-store",
       }
     );
-    return banners;
+    return Array.isArray(banners) ? banners : [];
   } catch (error) {
     console.error("Error fetching banners:", error);
     return [];

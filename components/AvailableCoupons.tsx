@@ -64,7 +64,7 @@ export default function AvailableCoupons() {
       }`);
 
       const data = await client.fetch(query, { now });
-      setCoupons(data);
+      setCoupons(Array.isArray(data) ? data : []);
     } catch (error) {
       console.error("Error fetching public coupons:", error);
     } finally {

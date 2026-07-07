@@ -16,6 +16,24 @@ const realClient = createClient({
   },
 });
 
+// Ensure result is always an array when query expects one
+function ensureSafeResult(result: any, query: string) {
+  // If result is already a valid value, return it
+  if (result !== null && result !== undefined) {
+    return result;
+  }
+  // If query looks like it returns a list (contains *[ or [] patterns), return empty array
+  if (query.includes("*[") || query.includes("[]")) {
+    return [];
+  }
+  // For count queries return 0
+  if (query.includes("count(")) {
+    return 0;
+  }
+  // Default fallback — return empty array (safest for .map() calls)
+  return [];
+}
+
 // A wrapper handler to intercept write operations on the client
 const clientWrapper = (targetClient: any) => {
   return new Proxy(targetClient, {
@@ -24,18 +42,18 @@ const clientWrapper = (targetClient: any) => {
         // Safe wrap fetch to ensure it doesn't crash on network or parameter issues
         return async (query: string, params: any = {}, options: any = {}) => {
           try {
+            let result;
             // If running in browser, proxy through serverless function to bypass CORS policies
             if (typeof window !== "undefined") {
-              // Only forward query and params (options might contain non-serializable objects like signals or callbacks)
-              return await serverSanityFetch(query, params);
+              // Only forward query and params (options might contain non-serializable objects)
+              result = await serverSanityFetch(query, params);
+            } else {
+              result = await target.fetch(query, params, options);
             }
-            return await target.fetch(query, params, options);
+            return ensureSafeResult(result, query);
           } catch (error) {
             console.error("Sanity fetch error: ", error);
-            // Return empty arrays/objects to prevent rendering crashes
-            if (query.includes("count(")) return 0;
-            if (query.includes("[]") || query.includes("blogs")) return [];
-            return null;
+            return ensureSafeResult(null, query);
           }
         };
       }
