@@ -2,16 +2,11 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   typescript: {
-    ignoreBuildErrors: true,
-  },
-  eslint: {
-    ignoreDuringBuilds: true,
+    ignoreBuildErrors: true, // TypeScript errors ignore karein
   },
   images: {
-    unoptimized: true,
-  },
-  // Yeh line automatic system prefetching loop ko block kar degi
-  productionBrowserSourceMaps: false,
+    unoptimized: true, // Images ko local rakhne ke liye
+  }
 };
 
 export default nextConfig;
