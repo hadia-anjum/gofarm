@@ -1,5 +1,6 @@
 import { createClient } from "next-sanity";
 import { apiVersion, dataset, projectId } from "../env";
+import { serverSanityFetch } from "./actions";
 
 // Real client for fetching data (uses CDN for better performance)
 const realClient = createClient({
@@ -23,6 +24,10 @@ const clientWrapper = (targetClient: any) => {
         // Safe wrap fetch to ensure it doesn't crash on network or parameter issues
         return async (query: string, params: any = {}, options: any = {}) => {
           try {
+            // If running in browser, proxy through serverless function to bypass CORS policies
+            if (typeof window !== "undefined") {
+              return await serverSanityFetch(query, params, options);
+            }
             return await target.fetch(query, params, options);
           } catch (error) {
             console.error("Sanity fetch error: ", error);
