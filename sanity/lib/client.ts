@@ -26,7 +26,8 @@ const clientWrapper = (targetClient: any) => {
           try {
             // If running in browser, proxy through serverless function to bypass CORS policies
             if (typeof window !== "undefined") {
-              return await serverSanityFetch(query, params, options);
+              // Only forward query and params (options might contain non-serializable objects like signals or callbacks)
+              return await serverSanityFetch(query, params);
             }
             return await target.fetch(query, params, options);
           } catch (error) {
