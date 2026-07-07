@@ -50,6 +50,10 @@ export async function getUserRole(firebaseUid: string) {
   return "admin"; // Grant admin/vendor access locally
 }
 
+export async function isAdmin() {
+  return true; // Bypass admin check locally
+}
+
 export async function getAddresses(userId: string) {
   return [];
 }
