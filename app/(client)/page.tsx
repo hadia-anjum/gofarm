@@ -13,11 +13,14 @@ import { generateOrganizationSchema, generateWebsiteSchema } from "@/lib/seo";
 export const dynamic = "force-dynamic";
 
 export default async function Home() {
-  const [categories, allProducts] = await Promise.all([
+  const [categoriesData, allProductsData] = await Promise.all([
     getCategories(8),
     getAllProducts(),
   ]);
-  const totalProductCount = allProducts?.length || 0;
+
+  const categories = Array.isArray(categoriesData) ? categoriesData : [];
+  const allProducts = Array.isArray(allProductsData) ? allProductsData : [];
+  const totalProductCount = allProducts.length;
 
   // Generate structured data
   const organizationSchema = generateOrganizationSchema();
