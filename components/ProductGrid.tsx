@@ -91,9 +91,10 @@ const ProductGrid = () => {
           weight
         }`;
         const variants = await client.fetch(variantsQuery);
-        setProductVariants(variants);
-        if (variants.length > 0) {
-          setSelectedTab(variants[0]._id);
+        const safeVariants = variants || [];
+        setProductVariants(safeVariants);
+        if (safeVariants.length > 0) {
+          setSelectedTab(safeVariants[0]._id);
         }
       } catch (error) {
         console.log("Error fetching variants:", error);
@@ -107,7 +108,7 @@ const ProductGrid = () => {
   // Fetch products for each variant (for carousels)
   useEffect(() => {
     const fetchProductsByVariant = async () => {
-      if (productVariants.length === 0) return;
+      if (!productVariants || productVariants.length === 0) return;
 
       setCarouselsLoading(true);
       try {
@@ -115,7 +116,7 @@ const ProductGrid = () => {
           {};
 
         // Fetch products for each variant
-        for (const variant of productVariants) {
+        for (const variant of (productVariants || [])) {
           const query = `*[_type == "product" && references($variantId)] | order(_createdAt desc) [0...10] {
             ...,
             "categories": categories[]->title,
@@ -124,7 +125,7 @@ const ProductGrid = () => {
           const products = await client.fetch(query, {
             variantId: variant._id,
           });
-          productsByVariantData[variant._id] = products;
+          productsByVariantData[variant._id] = products || [];
         }
 
         setProductsByVariant(productsByVariantData);
@@ -304,7 +305,7 @@ const ProductGrid = () => {
         </div>
       ) : (
         <div className="space-y-8 mb-16">
-          {productVariants.map((variant) => {
+          {(productVariants || []).map((variant) => {
             const variantProducts = productsByVariant[variant._id] || [];
             if (variantProducts.length === 0) return null;
 
