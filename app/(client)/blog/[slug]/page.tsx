@@ -386,7 +386,7 @@ const BlogSidebar = async ({ slug }: { slug: string }) => {
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-2 sm:space-y-3 p-4 sm:p-6 pt-0">
-          {uniqueCategories.map((category) => (
+          {uniqueCategories.map((category: any) => (
             <div
               key={category._id}
               className="flex items-center justify-between p-2 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer group"
@@ -396,9 +396,9 @@ const BlogSidebar = async ({ slug }: { slug: string }) => {
               </p>
               <Badge variant="secondary" className="text-xs">
                 {
-                  categories.filter((blog) =>
+                  categories.filter((blog: any) =>
                     blog.blogcategories?.some(
-                      (cat) => cat?._id === category._id
+                      (cat: any) => cat?._id === category._id
                     )
                   ).length
                 }
